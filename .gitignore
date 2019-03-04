@@ -2,13 +2,15 @@
 
 # compiled output
 /dist
-/dist-*
+/dist*
 /tmp
 /src/ngfactory
 
 # dependencies
 /node_modules
 /bower_components
+/functions/node_modules
+/functions/lib
 
 # IDEs and editors
 /.idea

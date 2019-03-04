@@ -7,6 +7,7 @@
     <base href="/">
     <!--<link rel="stylesheet" href="css/main.css" type="text/css" />-->
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="The fluin.io site about Stephen Fluin and his Angular adventures.">
     <link rel="manifest" href="/assets/manifest.json">
     <meta name="theme-color" content="#545d65">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -21,13 +22,19 @@
 
         ga('create', 'UA-66278430-2', 'auto');
     </script>
-    <script src="./webfont.js"></script>
+    
     <script>
-        WebFont.load({
+        WebFontConfig = ({
             google: {
                 families: ['Montserrat', 'Roboto Mono']
             }
         });
+        (function(d) {
+      var wf = d.createElement('script'), s = d.scripts[0];
+      wf.src = './webfont.js';
+      wf.async = true;
+      s.parentNode.insertBefore(wf, s);
+   })(document);
     </script>
 </head>
 

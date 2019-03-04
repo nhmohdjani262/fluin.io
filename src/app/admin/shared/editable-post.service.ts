@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { AngularFireDatabase, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2/database';
+import { Observable } from 'rxjs';
+import { AngularFireDatabase, AngularFireObject, AngularFireList } from '@angular/fire/database';
 import { Post, PostService } from '../../shared/post.service';
 
 
@@ -10,26 +10,22 @@ export class EditablePostService {
     constructor(public db: AngularFireDatabase, public ps: PostService) {
 
     }
-    getObject(id: string): FirebaseObjectObservable<Post> {
+    getObject(id: string): AngularFireObject<Post> {
         return this.db.object(`posts/${id}/`);
     }
-    getPostList(): FirebaseListObservable<Post[]> {
+    getPostList(): AngularFireList<Post> {
         return this.db.list('posts');
     }
     save(post: Post) {
+        if (post.key !== undefined || post.key !== null) {
+            delete post.key;
+        }
         if (post.id) {
-            let e = this.getObject(post.id);
-            console.log('starting update', e,post);
+            const e = this.getObject(post.id);
             e.update(post).then(console.log, console.error);
-            console.log('Finished upate.');
         } else {
-            let l = this.getPostList();
-            let result = l.push(post);
-
-            result.then(r => {
-                console.log('promise finished with', r)
-            });
-
+            const l = this.getPostList();
+            l.push(post);
         }
         this.ps.refreshData();
     }

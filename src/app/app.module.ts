@@ -2,10 +2,8 @@ import { NgModule, ErrorHandler } from '@angular/core';
 
 import { BrowserModule, Title } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
-import { HttpModule } from '@angular/http';
 
 import { PostService } from './shared/post.service';
-import { TalkService } from './shared/talk.service';
 import { AdminService } from './shared/admin.service';
 
 import { FluinioAppComponent } from './fluinio.component';
@@ -13,12 +11,13 @@ import { HomeComponent } from './pages/home.component';
 import { BlogComponent } from './pages/blog.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 // routes
+import { NotFoundComponent } from './not-found.component';
+import { Send404Component } from 'app/send-404.component';
 import { BlogPostComponent } from './pages/blog-post.component';
 import { ProjectsComponent } from './pages/projects.component';
-import { TalksComponent } from './pages/talks.component';
-import { TalkViewComponent } from './pages/talk-view.component';
 
 import { EmbeddableModule } from './embeddable/embeddable.module';
 
@@ -27,26 +26,29 @@ import { routeConfig } from './app.routes';
 
 // Pipes
 import { FirebaseToolsModule } from './firebasetools/firebasetools.module';
+import { environment } from 'environments/environment';
+import { HttpClientModule } from '@angular/common/http';
 
 
 @NgModule({
     imports: [
         BrowserModule,
         RouterModule.forRoot(routeConfig),
-        HttpModule,
+        HttpClientModule,
         FirebaseToolsModule,
         BrowserAnimationsModule,
-        EmbeddableModule
+        EmbeddableModule,
+        ServiceWorkerModule.register('/ngsw-worker.js', {enabled: environment.production}),
     ],
     declarations: [
         FluinioAppComponent,
+        NotFoundComponent,
         HomeComponent,
         BlogComponent,
-        TalksComponent,
-        TalkViewComponent,
         BlogPostComponent,
         BioComponent,
         ProjectsComponent,
+        Send404Component,
     ],
     bootstrap: [FluinioAppComponent],
     providers: [
@@ -56,5 +58,4 @@ import { FirebaseToolsModule } from './firebasetools/firebasetools.module';
         AdminService,
     ],
 })
-export class AppModule { }
-
+export class AppModule {}

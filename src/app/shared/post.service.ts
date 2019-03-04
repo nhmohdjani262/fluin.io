@@ -1,21 +1,20 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
+import { HttpClient } from '@angular/common/http';
+import { Observable ,  Subject } from 'rxjs';
+import { shareReplay, startWith, map, switchMap } from 'rxjs/operators';
+import { SafeHtml } from '@angular/platform-browser';
 
-import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/operator/startWith';
-import 'rxjs/add/operator/shareReplay';
-import 'rxjs/add/operator/map';
-
-
-export interface Post {
+export class Post {
     key: string;
-    body: string;
-    date: string;
-    id: string;
-    image: string;
-    title: string;
-    renderedBody?: string;
+    body?: string;
+    date?: string;
+    id?: string;
+    image?: string;
+    title?: string;
+    renderedBody?: SafeHtml;
+    constructor() {
+        this.key = '';
+    }
 }
 
 @Injectable()
@@ -24,7 +23,7 @@ export class PostService {
     /**
      * An object with post keys as keys, and post data as values
      */
-    postMap: Observable<any>;
+    postMap: Observable<{ [key: string]: Post }>;
     /**
      * An sorted array of posts with keys directly on the object.
      */
@@ -32,42 +31,46 @@ export class PostService {
 
     private forceRefresher = new Subject();
 
-    constructor(private http: Http) {
-        this.postMap = this.forceRefresher.startWith(null).switchMap(() => this.http.get(this.url)
-            .map(response => {
-                let result = response.json();
-                return result;
-            })).shareReplay(1);
+    constructor(private http: HttpClient) {
+        this.postMap = this.forceRefresher.pipe(
+            startWith(null),
+            switchMap(() => this.http.get<any>(this.url)),
+            shareReplay(1)
+        );
 
         // Force it to be hot and available for everyone without additional http requests
-        this.postMap.subscribe(n => n);
-
+        // Then Cache it
+        this.postMap.subscribe(n => {
+            localStorage['fluinPostCache'] = JSON.stringify(n);
+        });
+        this.postMap = this.postMap.pipe(startWith(JSON.parse(localStorage['fluinPostCache'] || '{}')));
 
         // Turn an object into an array, similar to refirebase
-        this.postList = this.postMap.map(data => {
+        this.postList = this.postMap.pipe(
+            map(data => {
+                const list = [];
+                for (const key of Object.keys(data)) {
+                    const item = data[key];
+                    item.key = key;
 
-            let list = [];
-            for (let key of Object.keys(data)) {
-                let item = data[key];
-                item.key = key;
-
-                // Only include past items
-                if (!this.isFuture(item)) {
-                    list.push(item);
+                    // Only include past items
+                    if (!this.isFuture(item)) {
+                        list.push(item);
+                    }
                 }
-            }
-            list.sort((a, b) => {
-                if (a.date > b.date) {
-                    return -1;
-                } else if (b.date > a.date) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            });
-            return list;
-        }).shareResults();
-
+                list.sort((a, b) => {
+                    if (a.date > b.date) {
+                        return -1;
+                    } else if (b.date > a.date) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+                return list;
+            }),
+            shareReplay(1)
+        );
     }
     refreshData() {
         this.forceRefresher.next();

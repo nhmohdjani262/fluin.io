@@ -1,0 +1,30 @@
+language: node_js
+node_js:
+ - "8.11"
+
+branches:
+  only:
+    - master
+
+before_script:
+  - yarn global add @angular/cli http-server wait-on firebase-tools
+
+cache:
+  yarn: true
+  directories:
+    - node_modules
+
+script:
+  - ng lint
+  - ng build --prod
+  - tools/lighthouse-test.sh
+
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  keep-history: true
+  local-dir: ./dist/
+  on:
+    branch: master

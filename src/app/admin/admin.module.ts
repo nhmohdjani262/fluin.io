@@ -3,19 +3,18 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpModule } from '@angular/http';
 import { FormsModule } from '@angular/forms';
-import { MdCardModule, MdInputModule } from '@angular/material';
+import { MatCardModule, MatInputModule } from '@angular/material';
 
 import { AdminComponent } from './admin.component';
 import { UploadComponent } from './upload.component';
 import { EditPostComponent } from './edit-post.component';
 
-import { AngularFireModule } from 'angularfire2';
-import { AngularFireDatabaseModule } from 'angularfire2/database';
-import { AngularFireAuthModule } from 'angularfire2/auth';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireDatabaseModule } from '@angular/fire/database';
 import { AuthService } from './shared/auth.service';
 import { EditablePostService } from './shared/editable-post.service';
 import { FirebaseToolsModule } from '../firebasetools/firebasetools.module';
-import { AppModule } from '../app.module';
+import { AngularFireAuthModule } from '@angular/fire/auth';
 
 @NgModule({
     imports: [
@@ -24,8 +23,8 @@ import { AppModule } from '../app.module';
         FormsModule,
         RouterModule.forChild([
             // path should be '' in Lazy loading, 'admin' in not
-            { path: '', component: AdminComponent, data: {title: 'Admin'} },
-            { path: ':id', component: EditPostComponent, data: {title: false}  },
+            { path: '', component: AdminComponent, data: { title: 'Admin' } },
+            { path: ':id', component: EditPostComponent, data: { title: false } },
         ]),
         AngularFireModule.initializeApp({
             apiKey: 'AIzaSyAJawulOMYRp0eXjMHLqiffzuS9tToCfAI',
@@ -33,19 +32,13 @@ import { AppModule } from '../app.module';
             databaseURL: 'https://fluindotio-website-93127.firebaseio.com',
             storageBucket: 'fluindotio-website-93127.appspot.com',
         }),
-        AngularFireDatabaseModule,
         AngularFireAuthModule,
-        MdCardModule, MdInputModule,
+        AngularFireDatabaseModule,
+        MatCardModule,
+        MatInputModule,
         FirebaseToolsModule,
     ],
-    declarations: [
-        AdminComponent,
-        UploadComponent,
-        EditPostComponent,
-    ],
-    providers: [
-        AuthService,
-        EditablePostService,
-    ]
+    declarations: [AdminComponent, UploadComponent, EditPostComponent],
+    providers: [AuthService, EditablePostService],
 })
-export class AdminModule { }
+export class AdminModule {}
